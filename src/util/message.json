@@ -3,6 +3,7 @@
   "NOTFOUND": "Not Found.",
   "SERVERERROR": "Internal Server Error.",
   "UNAUTHORIZED": "You Are Not Authorised",
-  "LOGIN":"Please Login First",
-  "VALIDATIONERROR":"Validation Error"
+  "LOGIN": "Please Login First",
+  "VALIDATIONERROR": "Validation Error",
+  "DUPLICAION": "Duplication Error"
 }

@@ -8,14 +8,14 @@ exports.response = (
 ) => {
   return res.status(status).json({
     success: true,
-    message: messages[message],
-    data: successData,
+    message: message,
+    data: successData
   });
 };
 
 exports.errorHandler = (err, res) => {
   return res.status(err.status || 500).json({
     success: false,
-    message: err.message,
+    message: err.message
   });
 };
