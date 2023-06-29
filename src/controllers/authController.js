@@ -19,13 +19,14 @@ exports.login = async (req, res) => {
           _id: userData._id,
           userName: userData.userName,
           password: userData.password,
+          userType: userData.userType,
           type: "login"
         };
 
         const _token = jwt.sign(token, process.env.JWT_KEY);
         res.cookie("access_token", _token);
         return response(
-          403,
+          200,
           `Welcome aboard ${capitalizeEveryFirstLetter(
             userData.firstName
           )} ${capitalizeEveryFirstLetter(userData.lastName)}`,
@@ -34,6 +35,7 @@ exports.login = async (req, res) => {
             userName: userData.userName,
             firstName: userData.firstName,
             lastName: userData.lastName,
+            userType: userData.userType,
             access_token: _token
           },
           res
@@ -57,24 +59,6 @@ exports.logOut = async (req, res) => {
   }
 };
 
-exports.singUp = async (req, res) => {
-  try {
-    const bodyData = { ...req.body, firstName: req.body.firstName };
-    const findUserName = await User.findOne({
-      userName: bodyData.userName
-    }).lean();
-    if (findUserName) {
-      return response(403, "User Name already exists", undefined, res);
-    }
-    const hash = await bcrypt.hash(bodyData.password, process.env.SALT * 1);
-    await User.create({ ...bodyData, password: hash });
-    return response(200, "User Registered", undefined, res);
-  } catch (error) {
-    console.log(error);
-    return errorHandler(error, res);
-  }
-};
-
 exports.check = async (req, res) => {
   try {
     const _token = req.cookies.access_token || req.headers.access_token;
@@ -91,6 +75,7 @@ exports.check = async (req, res) => {
               userName: userData.userName,
               firstName: userData.firstName,
               lastName: userData.lastName,
+              userType: userData.userType,
               access_token: _token
             },
             res
