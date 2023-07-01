@@ -15,8 +15,20 @@ const handler = require("./util/response");
 global.response = handler.response;
 global.errorHandler = handler.errorHandler;
 
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Credentials", "false");
+  next();
+});
+
 require("dotenv").config();
-app.use(cors());
+const corsOptions = {
+  "Access-Control-Allow-Credentials": true,
+  AccessControlAllowOrigin: "*",
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE"
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(coockieParser());
 app.use(morgan("dev"));

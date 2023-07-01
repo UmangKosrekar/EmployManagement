@@ -66,7 +66,6 @@ exports.check = async (req, res) => {
       jwt.verify(_token, process.env.JWT_KEY, async (err, decoded) => {
         if (decoded) {
           const userData = await User.findOne({ _id: decoded._id }).lean();
-          console.log("userData", userData);
           return response(
             200,
             undefined,

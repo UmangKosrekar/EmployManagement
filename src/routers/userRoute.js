@@ -12,4 +12,8 @@ route.post(
   user.add
 );
 
+route.post("/list",
+//  checkAuth(["admin"]),
+  user.list);
+
 module.exports = route;

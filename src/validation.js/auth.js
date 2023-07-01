@@ -35,6 +35,7 @@ module.exports = {
         "string.pattern.base": "Mobile Number should contain only digits.",
         "any.required": "Mobile Number is required."
       }),
-    designation: joi.string().required()
+    designation: joi.string().required(),
+    phonePrefix: joi.string().required()
   })
 };

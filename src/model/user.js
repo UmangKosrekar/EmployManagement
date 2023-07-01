@@ -43,6 +43,11 @@ const userSchema = new mongoose.Schema(
       required: true,
       trim: true
     },
+    phonePrefix: {
+      type: String,
+      required: true,
+      trim: true
+    },
     designation: {
       type: String,
       required: true,
