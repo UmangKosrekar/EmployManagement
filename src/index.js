@@ -17,7 +17,7 @@ global.errorHandler = handler.errorHandler;
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Credentials", "false");
+  res.setHeader("Access-Control-Allow-Credentials", "access_token");
   next();
 });
 
@@ -32,6 +32,8 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(coockieParser());
 app.use(morgan("dev"));
+
+// require("./cron/monthly");
 
 const indexRoute = require("./routers/indexRoute");
 app.use("/api/v1", indexRoute);

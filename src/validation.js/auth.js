@@ -37,5 +37,13 @@ module.exports = {
       }),
     designation: joi.string().required(),
     phonePrefix: joi.string().required()
+  }),
+  leaveApply: joi.object().keys({
+    typeOfLeave: joi.string().required(),
+    startDate: joi.string().required(),
+    endDate: joi.string().required(),
+    firstHalf: joi.boolean(),
+    secondHalf: joi.boolean(),
+    leaveDescription: joi.string().required()
   })
 };

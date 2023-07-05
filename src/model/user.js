@@ -52,6 +52,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true
+    },
+    usedLeaves: {
+      type: Number,
+      default: 0
+    },
+    availableLeaves: {
+      type: Number,
+      default: 3
     }
   },
   { timestamps: true }

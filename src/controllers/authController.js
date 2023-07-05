@@ -66,22 +66,23 @@ exports.check = async (req, res) => {
       jwt.verify(_token, process.env.JWT_KEY, async (err, decoded) => {
         if (decoded) {
           const userData = await User.findOne({ _id: decoded._id }).lean();
-          return response(
-            200,
-            undefined,
-            {
-              _id: userData._id,
-              userName: userData.userName,
-              firstName: userData.firstName,
-              lastName: userData.lastName,
-              userType: userData.userType,
-              access_token: _token
-            },
-            res
-          );
-        } else {
-          return response(401, "Session expired", undefined, res);
+          if (userData) {
+            return response(
+              200,
+              undefined,
+              {
+                _id: userData._id,
+                userName: userData.userName,
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                userType: userData.userType,
+                access_token: _token
+              },
+              res
+            );
+          }
         }
+        return response(401, "Session expired", undefined, res);
       });
     } else {
       return response(401, "Token not found", undefined, res);

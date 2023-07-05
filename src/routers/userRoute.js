@@ -12,8 +12,9 @@ route.post(
   user.add
 );
 
-route.post("/list",
-//  checkAuth(["admin"]),
-  user.list);
+route.post("/list", checkAuth(["admin"]), user.list);
+route.get("/view/:id", checkAuth(["admin"]), user.view);
+route.post("/update", checkAuth(["admin"]), user.update);
+route.get("/getProfile", checkAuth(["admin", "employ"]), user.getProfile);
 
 module.exports = route;

@@ -9,6 +9,7 @@ const checkAuth = (roles) => (req, res, next) => {
         if (decoded && decoded.userType) {
           roles.map((role) => {
             if (role == decoded.userType) {
+              req.user = decoded;
               next();
             }
           });
