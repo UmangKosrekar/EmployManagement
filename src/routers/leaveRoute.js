@@ -12,8 +12,8 @@ route.post(
   leave.applyLeave
 );
 route.get("/remove/:id", checkAuth(["employ"]), leave.removeLeave);
-// route.get("/view/:id", checkAuth(["admin"]), leave.view);
-// route.post("/update", checkAuth(["admin"]), leave.update);
+route.get("/list", checkAuth(["admin"]), leave.leaveList);
+route.post("/change-status", checkAuth(["admin"]), leave.changeStatus);
 // route.get("/getProfile", checkAuth(["admin", "employ"]), leave.getProfile);
 
 module.exports = route;

@@ -17,7 +17,7 @@ exports.applyLeave = async (req, res) => {
       endDate = moment(bodyData.endDate).startOf("day");
 
     if (startDate <= d || startDate > endDate) {
-      return response(400, "Invalid Leave", undefined, res);
+      return response(400, "Invalid Leave1", undefined, res);
     }
 
     bodyData["numberOfLeave"] = (endDate - startDate) / 1000 / 60 / 60 / 24;
@@ -52,7 +52,7 @@ exports.applyLeave = async (req, res) => {
     //     );
     //   }
     // });
-    return response(400, "Leave applied", undefined, res);
+    return response(200, "Leave applied", undefined, res);
   } catch (error) {
     console.log(error);
     return errorHandler(error, res);
@@ -62,11 +62,14 @@ exports.applyLeave = async (req, res) => {
 exports.removeLeave = async (req, res) => {
   try {
     const { id } = req.params;
-    const leaveData = await Leave.findOne({ _id: new ObjectId(id) }).lean();
+    const leaveData = await Leave.findOne({
+      _id: new ObjectId(id),
+      userId: new ObjectId(req.user._id)
+    }).lean();
     if (!leaveData) {
       return response(400, "Leave not found", undefined, res);
     }
-    if (leaveData.status == "confirm") {
+    if (leaveData.status != "pending") {
       return response(
         400,
         "Confirmed Leave can not be cancled",
@@ -88,6 +91,136 @@ exports.removeLeave = async (req, res) => {
     // );
     await Leave.deleteOne({ _id: new ObjectId(id) });
     return response(200, "Leave Removed", undefined, res);
+  } catch (error) {
+    console.log(error);
+    return errorHandler(error, res);
+  }
+};
+
+exports.leaveList = async (req, res) => {
+  try {
+    const leaveData = await Leave.aggregate([
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "userData"
+        }
+      },
+      {
+        $unwind: "$userData"
+      },
+      {
+        $addFields: {
+          sortField: {
+            $switch: {
+              branches: [
+                { case: { $eq: ["$status", "pending"] }, then: 0 },
+                { case: { $eq: ["$status", "confirm"] }, then: 1 },
+                { case: { $eq: ["$status", "reject"] }, then: 2 }
+              ],
+              default: 3
+            }
+          }
+        }
+      },
+      {
+        $sort: { sortField: 1 }
+      },
+      {
+        $project: {
+          _id: 1,
+          typeOfLeave: 1,
+          numberOfLeave: 1.5,
+          startDate: 1,
+          endDate: 1,
+          firstHalf: 1,
+          secondHalf: 1,
+          status: 1,
+          leaveDescription: 1,
+          userData: {
+            _id: 1,
+            firstName: 1,
+            lastName: 1,
+            userName: 1,
+            designation: 1,
+            usedLeaves: 1,
+            availableLeaves: 1
+          }
+        }
+      }
+    ]);
+    return response(200, undefined, leaveData, res);
+  } catch (error) {
+    console.log(error);
+    return errorHandler(error, res);
+  }
+};
+
+exports.changeStatus = async (req, res) => {
+  try {
+    const { id, status } = req.body;
+    const leaveFind = await Leave.findOne({ _id: new ObjectId(id) }).lean();
+    if (status == "confirm") {
+      await Leave.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: { status } }
+      ).then(async (data) => {
+        if (leaveFind.status != "confirm") {
+          await User.updateOne(
+            { _id: new ObjectId(data.userId) },
+            {
+              $inc: {
+                usedLeaves: leaveFind.numberOfLeave,
+                availableLeaves: -leaveFind.numberOfLeave
+              }
+            }
+          );
+        }
+      });
+    } else if (status == "pending") {
+      await Leave.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: { status } }
+      ).then(async (data) => {
+        if (leaveFind.status == "confirm") {
+          await User.updateOne(
+            { _id: new ObjectId(data.userId) },
+            {
+              $inc: {
+                usedLeaves: -leaveFind.numberOfLeave,
+                availableLeaves: leaveFind.numberOfLeave
+              }
+            }
+          );
+        }
+      });
+    } else if (status == "reject") {
+      await Leave.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: { status } }
+      ).then(async (data) => {
+        if (leaveFind.status == "confirm") {
+          await User.updateOne(
+            { _id: new ObjectId(data.userId) },
+            {
+              $inc: {
+                usedLeaves: -leaveFind.numberOfLeave,
+                availableLeaves: leaveFind.numberOfLeave
+              }
+            }
+          );
+        }
+      });
+    }
+
+    return response(
+      200,
+      "Leave " + status.charAt(0).toLowerCase() + status.slice(0),
+      undefined,
+      res
+    );
   } catch (error) {
     console.log(error);
     return errorHandler(error, res);

@@ -187,7 +187,8 @@ exports.getProfile = async (req, res) => {
                 endDate: 1,
                 firstHalf: 1,
                 secondHalf: 1,
-                status: 1
+                status: 1,
+                leaveDescription: 1
               }
             },
             {
