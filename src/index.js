@@ -33,7 +33,7 @@ app.use(express.json());
 app.use(coockieParser());
 app.use(morgan("dev"));
 
-// require("./cron/monthly");
+require("./cron/monthly");
 
 const indexRoute = require("./routers/indexRoute");
 app.use("/api/v1", indexRoute);
